@@ -82,6 +82,9 @@ contract Gallery {
                             abi.encodePacked(images[i].proposals[j].owner)
                         ) == keccak256(abi.encodePacked(msg.sender))
                     ) {
+                        images[i].proposals[j].owner.transfer(
+                            images[i].proposals[j].price
+                        );
                         images[i].proposals[j] = images[i].proposals[
                             images[i].proposals.length - 1
                         ];
