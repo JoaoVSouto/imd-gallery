@@ -45,8 +45,23 @@ export function Header() {
         <Flex gap="3" align="center">
           <Popover>
             <PopoverTrigger>
-              <Button variant="unstyled" colorScheme="blue">
+              <Button variant="unstyled" colorScheme="blue" pos="relative">
                 <BellIcon fontSize="xl" />
+                <Text
+                  as="small"
+                  pos="absolute"
+                  top="6px"
+                  right="3px"
+                  bg="red.600"
+                  w={4}
+                  h={4}
+                  d="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  borderRadius="full"
+                >
+                  1
+                </Text>
               </Button>
             </PopoverTrigger>
             <PopoverContent>
