@@ -3,6 +3,7 @@ import { Container } from '@chakra-ui/react';
 
 import { Header } from '../components/Header';
 import { UploadSection } from '../components/UploadSection';
+import { Gallery } from '../components/Gallery';
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
 
       <Container as="main" maxW="container.lg">
         <UploadSection />
+        <Gallery />
       </Container>
     </>
   );

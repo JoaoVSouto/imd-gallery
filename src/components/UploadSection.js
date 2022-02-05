@@ -70,7 +70,7 @@ export function UploadSection() {
           border="2px dotted"
           transition="all 0.2s"
           borderColor={isDragActive ? 'blue.400' : 'gray.500'}
-          borderRadius="lg"
+          borderRadius="md"
           p="8"
           textAlign="center"
           pos="relative"

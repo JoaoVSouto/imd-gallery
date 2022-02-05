@@ -9,7 +9,6 @@ import {
   PopoverTrigger,
   PopoverContent,
   PopoverArrow,
-  PopoverCloseButton,
   PopoverHeader,
   PopoverBody,
 } from '@chakra-ui/react';
@@ -25,6 +24,10 @@ export function Header() {
       p="4"
       borderBottom="1px solid"
       borderBottomColor="gray.600"
+      pos="sticky"
+      top={0}
+      zIndex="sticky"
+      bgColor="gray.800"
     >
       <Container
         as={Flex}
@@ -53,26 +56,28 @@ export function Header() {
                 {proposals.length === 0 ? (
                   "You don't have any proposals yet!"
                 ) : (
-                  <Flex align="center" justify="space-between">
-                    <Flex align="center" gap="2">
-                      <Image
-                        src="https://www.arweave.net/gySlSWWvotlwL1lWwtSE_HpROBjfnSVbzP0UX44Kdws?ext=png"
-                        alt="NoiaDuck 331"
-                        borderRadius="full"
-                        boxSize="32px"
-                        objectFit="cover"
-                      />
-                      <Text>NoiaDuck #331</Text>
-                      <Text fontWeight="bold">3 Ξ</Text>
-                    </Flex>
+                  <Flex direction="column" gap={3}>
+                    <Flex align="center" justify="space-between">
+                      <Flex align="center" gap="2">
+                        <Image
+                          src="https://www.arweave.net/gySlSWWvotlwL1lWwtSE_HpROBjfnSVbzP0UX44Kdws?ext=png"
+                          alt="NoiaDuck 331"
+                          borderRadius="full"
+                          boxSize="32px"
+                          objectFit="cover"
+                        />
+                        <Text>NoiaDuck #331</Text>
+                        <Text fontWeight="bold">3 Ξ</Text>
+                      </Flex>
 
-                    <Flex gap="2">
-                      <Button size="xs" colorScheme="green" variant="ghost">
-                        <CheckIcon />
-                      </Button>
-                      <Button size="xs" colorScheme="red" variant="ghost">
-                        <CloseIcon fontSize="x-small" />
-                      </Button>
+                      <Flex gap="2">
+                        <Button size="xs" colorScheme="green" variant="ghost">
+                          <CheckIcon />
+                        </Button>
+                        <Button size="xs" colorScheme="red" variant="ghost">
+                          <CloseIcon fontSize="x-small" />
+                        </Button>
+                      </Flex>
                     </Flex>
                   </Flex>
                 )}
