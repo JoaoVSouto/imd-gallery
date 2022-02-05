@@ -14,19 +14,43 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useDropzone } from 'react-dropzone';
+import ipfsClient from 'ipfs-http-client';
+import { useCall, useContract } from 'react-ethers';
 import { FiUpload } from 'react-icons/fi';
 import { IoMdCloudUpload } from 'react-icons/io';
 
+import Gallery from '../abis/Gallery.json';
+
+const ipfs = ipfsClient({
+  host: 'ipfs.infura.io',
+  port: 5001,
+  protocol: 'https',
+});
+
 export function UploadSection() {
   const toast = useToast();
+  const contract = useContract(
+    Gallery.networks[window.ethereum.networkVersion].address,
+    Gallery.abi
+  );
+  const { contractCall } = useCall();
 
   const [sentFile, setSentFile] = React.useState(null);
+  const [fileBuffer, setFileBuffer] = React.useState(null);
+  const [isUploading, setIsUploading] = React.useState(false);
   const [imageTitle, setImageTitle] = React.useState('');
   const [hasImageTitleError, setHasImageTitleError] = React.useState(false);
 
   const onDrop = React.useCallback(([uploadedFile]) => {
     if (uploadedFile) {
       setSentFile(URL.createObjectURL(uploadedFile));
+
+      const reader = new window.FileReader();
+      reader.readAsArrayBuffer(uploadedFile);
+
+      reader.onloadend = () => {
+        setFileBuffer(Buffer(reader.result));
+      };
     }
   }, []);
 
@@ -50,6 +74,7 @@ export function UploadSection() {
 
   function resetFormState() {
     setSentFile(null);
+    setFileBuffer(null);
     setImageTitle('');
     setHasImageTitleError(false);
   }
@@ -59,6 +84,46 @@ export function UploadSection() {
       setHasImageTitleError(true);
       return;
     }
+
+    setIsUploading(true);
+
+    ipfs.add(fileBuffer, async (err, result) => {
+      const showErrorToast = () =>
+        toast({
+          title: 'Error uploading file',
+          description: 'Please try again later',
+          status: 'error',
+          duration: 4000,
+          isClosable: true,
+        });
+
+      if (err) {
+        setIsUploading(false);
+        showErrorToast();
+        return;
+      }
+
+      const [{ hash: fileHash }] = result;
+
+      try {
+        await contractCall(contract, 'uploadImage', [
+          imageTitle.trim(),
+          fileHash,
+        ]);
+
+        toast({
+          title: 'File uploaded!',
+          status: 'success',
+          duration: 4000,
+          isClosable: true,
+        });
+      } catch {
+        showErrorToast();
+      } finally {
+        setIsUploading(false);
+        resetFormState();
+      }
+    });
   }
 
   return (
@@ -130,6 +195,7 @@ export function UploadSection() {
               colorScheme="green"
               leftIcon={<FiUpload />}
               onClick={uploadFile}
+              isLoading={isUploading}
             >
               Upload
             </Button>
@@ -137,6 +203,7 @@ export function UploadSection() {
               colorScheme="red"
               variant="outline"
               onClick={resetFormState}
+              disabled={isUploading}
             >
               Cancel
             </Button>
