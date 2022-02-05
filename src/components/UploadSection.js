@@ -25,7 +25,9 @@ export function UploadSection() {
   const [hasImageTitleError, setHasImageTitleError] = React.useState(false);
 
   const onDrop = React.useCallback(([uploadedFile]) => {
-    setSentFile(URL.createObjectURL(uploadedFile));
+    if (uploadedFile) {
+      setSentFile(URL.createObjectURL(uploadedFile));
+    }
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -65,9 +67,9 @@ export function UploadSection() {
         <Box
           {...getRootProps()}
           mt="8"
-          border="1px dotted"
+          border="2px dotted"
           transition="all 0.2s"
-          borderColor={isDragActive ? 'teal.300' : 'gray.500'}
+          borderColor={isDragActive ? 'blue.400' : 'gray.500'}
           borderRadius="lg"
           p="8"
           textAlign="center"
@@ -82,8 +84,9 @@ export function UploadSection() {
             as={IoMdCloudUpload}
             fontSize="180px"
             pos="absolute"
-            color="gray.700"
-            opacity={0.8}
+            transition="all 0.2s"
+            color={isDragActive ? 'blue.400' : 'gray.700'}
+            opacity={isDragActive ? 0.4 : 0.8}
             top="-13px"
             left="10px"
             zIndex="-1"
