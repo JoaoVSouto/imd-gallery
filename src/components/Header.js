@@ -41,7 +41,6 @@ export function Header() {
           </PopoverTrigger>
           <PopoverContent>
             <PopoverArrow />
-            <PopoverCloseButton />
             <PopoverHeader>Proposals</PopoverHeader>
             <PopoverBody>
               {proposals.length === 0 ? (

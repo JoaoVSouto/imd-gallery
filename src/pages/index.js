@@ -8,7 +8,7 @@ export default function Home() {
     <>
       <Header />
 
-      <Container maxW="container.lg">
+      <Container as="main" maxW="container.lg">
         <UploadSection />
       </Container>
     </>

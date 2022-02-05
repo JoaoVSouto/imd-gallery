@@ -7,22 +7,25 @@ import {
   FormErrorMessage,
   FormLabel,
   Heading,
+  Icon,
   Image,
   Input,
+  Text,
   useToast,
 } from '@chakra-ui/react';
 import { useDropzone } from 'react-dropzone';
 import { FiUpload } from 'react-icons/fi';
+import { IoMdCloudUpload } from 'react-icons/io';
 
 export function UploadSection() {
+  const toast = useToast();
+
   const [sentFile, setSentFile] = React.useState(null);
   const [imageTitle, setImageTitle] = React.useState('');
   const [hasImageTitleError, setHasImageTitleError] = React.useState(false);
 
-  const toast = useToast();
-
-  const onDrop = React.useCallback(acceptedFiles => {
-    setSentFile(URL.createObjectURL(acceptedFiles[0]));
+  const onDrop = React.useCallback(([uploadedFile]) => {
+    setSentFile(URL.createObjectURL(uploadedFile));
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -58,7 +61,6 @@ export function UploadSection() {
 
   return (
     <Box mt="8">
-      <Heading size="lg">Upload your image to the world!</Heading>
       {!sentFile && (
         <Box
           {...getRootProps()}
@@ -66,11 +68,27 @@ export function UploadSection() {
           border="1px dotted"
           transition="all 0.2s"
           borderColor={isDragActive ? 'teal.300' : 'gray.500'}
-          borderRadius="xl"
+          borderRadius="lg"
           p="8"
+          textAlign="center"
+          pos="relative"
+          overflow="hidden"
         >
           <input {...getInputProps()} />
-          <p>Click or drop your image here...</p>
+          <Text fontSize="2xl">Upload your image or gif to the gallery!</Text>
+          <Text color="gray.500">Click here or drag your file...</Text>
+
+          <Icon
+            as={IoMdCloudUpload}
+            fontSize="180px"
+            pos="absolute"
+            color="gray.700"
+            opacity={0.8}
+            top="-13px"
+            left="10px"
+            zIndex="-1"
+            display={{ base: 'none', md: 'block' }}
+          />
         </Box>
       )}
 
@@ -83,6 +101,9 @@ export function UploadSection() {
           maxW={300}
           mx="auto"
         >
+          <Heading fontWeight="semibold" fontSize="2xl" mr="auto">
+            Setup your file
+          </Heading>
           <Image
             src={sentFile}
             alt="Image to be uploaded"
