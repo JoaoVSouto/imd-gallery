@@ -1,3 +1,4 @@
+import * as React from 'react';
 import {
   Button,
   Divider,
@@ -28,6 +29,9 @@ export function Post({
   const { state } = useWeb3();
   const toast = useToast();
 
+  const [isInteractingWithProposal, setIsInteractingWithProposal] =
+    React.useState(false);
+
   const removeSendProposalField =
     state.account === owner ||
     proposals.some(proposal => proposal.owner === state.account);
@@ -35,38 +39,64 @@ export function Post({
   async function createProposal(e) {
     e.preventDefault();
 
+    setIsInteractingWithProposal(true);
+
     const proposalValue = e.target.elements.proposal.value;
 
-    await rawContract.methods.addProposal(hash).send({
-      from: state.account,
-      value: web3.utils.toWei(proposalValue, 'ether'),
-    });
+    try {
+      await rawContract.methods.addProposal(hash).send({
+        from: state.account,
+        value: web3.utils.toWei(proposalValue, 'ether'),
+      });
 
-    toast({
-      title: 'Proposal sent!',
-      status: 'success',
-      duration: 2000,
-      isClosable: true,
-    });
-    e.target.reset();
-    onAddProposal(
-      hash,
-      state.account,
-      web3.utils.toWei(proposalValue, 'ether')
-    );
+      toast({
+        title: 'Proposal sent!',
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+      });
+      e.target.reset();
+      onAddProposal(
+        hash,
+        state.account,
+        web3.utils.toWei(proposalValue, 'ether')
+      );
+    } catch {
+      toast({
+        title: 'Error sending proposal',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsInteractingWithProposal(false);
+    }
   }
 
   async function removeProposal() {
-    await rawContract.methods.removeProposal(hash).send({
-      from: state.account,
-    });
-    toast({
-      title: 'Proposal removed!',
-      status: 'success',
-      duration: 2000,
-      isClosable: true,
-    });
-    onProposeRemoval(hash, state.account);
+    setIsInteractingWithProposal(true);
+
+    try {
+      await rawContract.methods.removeProposal(hash).send({
+        from: state.account,
+      });
+      toast({
+        title: 'Proposal removed!',
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+      });
+      onProposeRemoval(hash, state.account);
+    } catch {
+      toast({
+        title: 'Error removing proposal',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsInteractingWithProposal(false);
+    }
   }
 
   return (
@@ -143,6 +173,7 @@ export function Post({
                       colorScheme="red"
                       variant="link"
                       onClick={removeProposal}
+                      isLoading={isInteractingWithProposal}
                     >
                       <Icon as={FiTrash2} />
                     </Button>
@@ -162,8 +193,14 @@ export function Post({
                 placeholder="Send a proposal in ETH..."
                 variant="filled"
                 isRequired
+                disabled={isInteractingWithProposal}
               />
-              <Button type="submit" colorScheme="messenger" variant="link">
+              <Button
+                type="submit"
+                colorScheme="messenger"
+                variant="link"
+                isLoading={isInteractingWithProposal}
+              >
                 <Icon as={FiSend} />
               </Button>
             </Flex>
