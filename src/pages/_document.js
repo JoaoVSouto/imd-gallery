@@ -5,7 +5,12 @@ export default class Document extends NextDocument {
   render() {
     return (
       <Html lang="en">
-        <Head />
+        <Head>
+          <link
+            rel="icon"
+            href="https://imd.ufrn.br/portal/assets/images/favicon.svg"
+          />
+        </Head>
         <body>
           <ColorModeScript initialColorMode="dark" />
           <Main />
