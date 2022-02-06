@@ -74,11 +74,17 @@ contract Gallery {
         return images;
     }
 
-    // TODO: emit event when image is uploaded!
     function uploadImage(string memory name, string memory hash) public {
         require(bytes(name).length > 0);
         require(bytes(hash).length > 0);
         require(msg.sender != address(0));
+
+        for (uint256 i = 0; i < images.length; i++) {
+            if (keccak256(abi.encodePacked(images[i].hash)) ==
+                keccak256(abi.encodePacked(hash))) {
+                require(false, "Image already exists");
+            }
+        }
 
         Image storage image = images.push();
         image.owner = payable(msg.sender);
