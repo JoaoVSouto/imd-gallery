@@ -18,14 +18,18 @@ export function AppProvider({ children }) {
   const [posts, setPosts] = React.useState([]);
 
   const parsePost = React.useCallback(
-    post => ({
+    (post, regularParse = false) => ({
       hash: post.hash,
       name: post.name,
       owner: post.owner,
       proposals: post.proposals.map(proposal => ({
         owner: proposal.owner,
         price: weiToEther(
-          Number(web3?.utils.hexToNumberString(proposal.price._hex) ?? 0)
+          Number(
+            regularParse
+              ? proposal.price
+              : web3?.utils.hexToNumberString(proposal.price._hex) ?? 0
+          )
         ),
       })),
     }),
@@ -53,7 +57,7 @@ export function AppProvider({ children }) {
     async function retrievePosts() {
       const incomingPosts = await rawContract.methods.getImages().call();
 
-      setPosts(incomingPosts.map(parsePost).reverse());
+      setPosts(incomingPosts.map(post => parsePost(post, true)).reverse());
     }
 
     if (rawContract) {
