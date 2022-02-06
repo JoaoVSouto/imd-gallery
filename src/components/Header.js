@@ -1,3 +1,4 @@
+import * as React from 'react';
 import {
   Flex,
   Text,
@@ -11,17 +12,85 @@ import {
   PopoverArrow,
   PopoverHeader,
   PopoverBody,
+  useToast,
 } from '@chakra-ui/react';
 import { BellIcon, CheckIcon, CloseIcon } from '@chakra-ui/icons';
 import Identicon from 'identicon.js';
 import { useWeb3 } from 'react-ethers';
 
+import { useApp } from '../contexts/App';
 import { formatAddress } from '../utils/formatAddress';
+import { weiToEther } from '../utils/weiToEther';
 
 export function Header() {
   const { state, connectToMetamask } = useWeb3();
+  const { rawContract, web3 } = useApp();
+  const toast = useToast();
 
-  const proposals = [1];
+  const [proposals, setProposals] = React.useState([]);
+  const [acceptingProposal, setAcceptingProposal] = React.useState(null);
+  const [refusingProposal, setRefusingProposal] = React.useState(null);
+
+  React.useEffect(() => {
+    async function getProposals() {
+      const incomingProposals = await rawContract.methods
+        .getProposalsByOwner()
+        .call({ from: state.account });
+
+      setProposals(
+        incomingProposals.map(proposal => ({
+          owner: proposal.owner,
+          price: weiToEther(Number(proposal.price)),
+          imageHash: proposal.hash,
+          imageName: proposal.name,
+        }))
+      );
+    }
+
+    getProposals();
+  }, [rawContract.methods, state.account, web3.utils]);
+
+  async function acceptProposal(proposal) {
+    setAcceptingProposal(proposal);
+
+    try {
+      await rawContract.methods
+        .acceptProposal(proposal.imageHash, proposal.owner)
+        .send({ from: state.account });
+
+      toast({
+        title: 'Proposal accepted!',
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+      });
+      setProposals(state =>
+        state.filter(p => p.imageHash !== proposal.imageHash)
+      );
+    } finally {
+      setAcceptingProposal(null);
+    }
+  }
+
+  async function refuseProposal(proposal) {
+    setRefusingProposal(proposal);
+
+    try {
+      await rawContract.methods
+        .refuseProposal(proposal.imageHash, proposal.owner)
+        .send({ from: state.account });
+
+      toast({
+        title: 'Proposal refused!',
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+      });
+      setProposals(state => state.filter(p => p !== proposal));
+    } finally {
+      setRefusingProposal(null);
+    }
+  }
 
   return (
     <Box
@@ -53,21 +122,23 @@ export function Header() {
               <PopoverTrigger>
                 <Button variant="unstyled" colorScheme="blue" pos="relative">
                   <BellIcon fontSize="xl" />
-                  <Text
-                    as="small"
-                    pos="absolute"
-                    top="6px"
-                    right="3px"
-                    bg="red.600"
-                    w={4}
-                    h={4}
-                    d="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                    borderRadius="full"
-                  >
-                    1
-                  </Text>
+                  {proposals.length > 0 && (
+                    <Text
+                      as="small"
+                      pos="absolute"
+                      top="6px"
+                      right="3px"
+                      bg="red.600"
+                      w={4}
+                      h={4}
+                      d="flex"
+                      justifyContent="center"
+                      alignItems="center"
+                      borderRadius="full"
+                    >
+                      {proposals.length}
+                    </Text>
+                  )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent>
@@ -78,28 +149,58 @@ export function Header() {
                     "You don't have any proposals yet!"
                   ) : (
                     <Flex direction="column" gap={3}>
-                      <Flex align="center" justify="space-between">
-                        <Flex align="center" gap="2">
-                          <Image
-                            src="https://www.arweave.net/gySlSWWvotlwL1lWwtSE_HpROBjfnSVbzP0UX44Kdws?ext=png"
-                            alt="NoiaDuck 331"
-                            borderRadius="full"
-                            boxSize="32px"
-                            objectFit="cover"
-                          />
-                          <Text>NoiaDuck #331</Text>
-                          <Text fontWeight="bold">3 Ξ</Text>
-                        </Flex>
+                      {proposals.map(proposal => (
+                        <Flex
+                          key={`${proposal.owner}-${proposal.imageHash}`}
+                          align="center"
+                          justify="space-between"
+                        >
+                          <Flex align="center" gap="2">
+                            <Image
+                              src={`https://ipfs.infura.io/ipfs/${proposal.imageHash}`}
+                              alt={proposal.imageName}
+                              borderRadius="full"
+                              boxSize="32px"
+                              objectFit="cover"
+                            />
+                            <Text>{proposal.imageName}</Text>
+                            <Text fontWeight="bold">{proposal.price} Ξ</Text>
+                          </Flex>
 
-                        <Flex gap="2">
-                          <Button size="xs" colorScheme="green" variant="ghost">
-                            <CheckIcon />
-                          </Button>
-                          <Button size="xs" colorScheme="red" variant="ghost">
-                            <CloseIcon fontSize="x-small" />
-                          </Button>
+                          <Flex gap="2">
+                            <Button
+                              size="xs"
+                              colorScheme="green"
+                              variant="ghost"
+                              onClick={() => acceptProposal(proposal)}
+                              isLoading={
+                                acceptingProposal &&
+                                acceptingProposal.imageHash ===
+                                  proposal.imageHash &&
+                                acceptingProposal.owner === proposal.owner
+                              }
+                              isDisabled={refusingProposal || acceptingProposal}
+                            >
+                              <CheckIcon />
+                            </Button>
+                            <Button
+                              size="xs"
+                              colorScheme="red"
+                              variant="ghost"
+                              onClick={() => refuseProposal(proposal)}
+                              isLoading={
+                                refusingProposal &&
+                                refusingProposal.imageHash ===
+                                  proposal.imageHash &&
+                                refusingProposal.owner === proposal.owner
+                              }
+                              disabled={acceptingProposal || refusingProposal}
+                            >
+                              <CloseIcon fontSize="x-small" />
+                            </Button>
+                          </Flex>
                         </Flex>
-                      </Flex>
+                      ))}
                     </Flex>
                   )}
                 </PopoverBody>

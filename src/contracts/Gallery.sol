@@ -16,6 +16,7 @@ contract Gallery {
         address payable owner;
         uint256 price;
         string hash;
+        string name;
     }
 
     struct Image {
@@ -24,6 +25,8 @@ contract Gallery {
         string hash;
         Proposal[] proposals;
     }
+
+    event ImageUploaded(Image image);
 
     Image[] public images;
     address payable owner;
@@ -38,15 +41,18 @@ contract Gallery {
         returns (ProposalImage[] memory)
     {
         uint256 qntProposals = 0;
-        uint256 index;
+        uint256 index = 0;
+
         for (uint256 i = 0; i < images.length; i++) {
             if (msg.sender == images[i].owner) {
                 qntProposals += images[i].proposals.length;
             }
         }
+
         ProposalImage[] memory ownerProposals = new ProposalImage[](
             qntProposals
         );
+
         for (uint256 i = 0; i < images.length; i++) {
             if (msg.sender == images[i].owner) {
                 for (uint256 j = 0; j < images[i].proposals.length; j++) {
@@ -54,6 +60,7 @@ contract Gallery {
                     proposal.owner = images[i].proposals[j].owner;
                     proposal.price = images[i].proposals[j].price;
                     proposal.hash = images[i].hash;
+                    proposal.name = images[i].name;
                     ownerProposals[index] = proposal;
                     index++;
                 }
@@ -77,6 +84,7 @@ contract Gallery {
         image.owner = payable(msg.sender);
         image.name = name;
         image.hash = hash;
+        emit ImageUploaded(image);
     }
 
     function addProposal(string memory imageHash) public payable {
