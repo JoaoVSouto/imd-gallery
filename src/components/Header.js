@@ -50,8 +50,10 @@ export function Header() {
       );
     }
 
-    getProposals();
-  }, [rawContract.methods, state.account, web3.utils]);
+    if (state.isLogged) {
+      getProposals();
+    }
+  }, [rawContract.methods, state.account, state.isLogged, web3.utils]);
 
   async function acceptProposal(proposal) {
     setAcceptingProposal(proposal);

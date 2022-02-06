@@ -9,7 +9,7 @@ const AppContext = React.createContext({});
 
 export function AppProvider({ children }) {
   const contract = useContract(
-    Gallery.networks[window.ethereum.networkVersion].address,
+    Gallery.networks[window.ethereum?.networkVersion ?? '3']?.address,
     Gallery.abi
   );
 
@@ -42,7 +42,7 @@ export function AppProvider({ children }) {
     setRawContract(
       new newWeb3.eth.Contract(
         Gallery.abi,
-        Gallery.networks[window.ethereum.networkVersion].address
+        Gallery.networks[window.ethereum?.networkVersion ?? '3']?.address
       )
     );
   }, []);
