@@ -76,6 +76,7 @@ export function Post({
         alt={name}
         objectFit="cover"
         borderTopRadius="md"
+        h="310px"
       />
       <Flex
         flex={1}
