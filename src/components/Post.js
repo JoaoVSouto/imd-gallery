@@ -119,9 +119,7 @@ export function Post({
           {name}
         </Text>
         <Flex px={4} gap={2} mb={1}>
-          <Text fontStyle="italic" fontSize="sm">
-            Owned by {formatAddress(owner)}
-          </Text>
+          <Text fontSize="small">Owned by {formatAddress(owner)}</Text>
           <Image
             borderRadius="full"
             boxSize="20px"
@@ -136,7 +134,7 @@ export function Post({
             {proposals.length === 0 && (
               <Text
                 fontStyle="italic"
-                fontSize="sm"
+                fontSize="small"
                 color="gray.300"
                 lineHeight="shorter"
                 mb={1}

@@ -244,6 +244,9 @@ export function Header() {
               p={2}
               borderRadius="md"
               fontSize="sm"
+              title={`${weiToEther(
+                web3.utils.hexToNumberString(state.balance._hex)
+              )} ETH`}
             >
               {weiToEther(web3.utils.hexToNumberString(state.balance._hex))
                 .toString()

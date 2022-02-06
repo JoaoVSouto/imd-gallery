@@ -10,6 +10,17 @@ export default class Document extends NextDocument {
             rel="icon"
             href="https://imd.ufrn.br/portal/assets/images/favicon.svg"
           />
+
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link
+            rel="preconnect"
+            href="https://fonts.gstatic.com"
+            crossOrigin="anonymous"
+          />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;600;700&display=swap"
+            rel="stylesheet"
+          />
         </Head>
         <body>
           <ColorModeScript initialColorMode="dark" />

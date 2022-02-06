@@ -9,4 +9,7 @@ export const theme = extendTheme({
       400: '#05a1e6',
     },
   },
+  fonts: {
+    body: '"Fira Sans", sans-serif',
+  },
 });
