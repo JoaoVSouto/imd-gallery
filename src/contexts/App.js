@@ -21,6 +21,21 @@ export function AppProvider({ children }) {
   window.contract = contract;
   window.web33 = web3;
 
+  const parsePost = React.useCallback(
+    post => ({
+      hash: post.hash,
+      name: post.name,
+      owner: post.owner,
+      proposals: post.proposals.map(proposal => ({
+        owner: proposal.owner,
+        price: weiToEther(
+          Number(web3?.utils.hexToNumberString(proposal.price._hex) ?? 0)
+        ),
+      })),
+    }),
+    [web3?.utils]
+  );
+
   React.useEffect(() => {
     const newWeb3 = new Web3(window.ethereum);
     setWeb3(newWeb3);
@@ -36,27 +51,25 @@ export function AppProvider({ children }) {
     async function retrievePosts() {
       const incomingPosts = await contract.getImages();
 
-      setPosts(
-        incomingPosts
-          .map(post => ({
-            hash: post.hash,
-            name: post.name,
-            owner: post.owner,
-            proposals: post.proposals.map(proposal => ({
-              owner: proposal.owner,
-              price: weiToEther(
-                Number(web3.utils.hexToNumberString(proposal.price._hex))
-              ),
-            })),
-          }))
-          .reverse()
-      );
+      setPosts(incomingPosts.map(parsePost).reverse());
     }
 
-    if (contract && web3?.utils) {
+    if (contract) {
       retrievePosts();
     }
-  }, [contract, web3?.utils]);
+  }, [contract, parsePost]);
+
+  React.useEffect(() => {
+    function handleImageUploaded(post) {
+      setPosts(state => [parsePost(post), ...state]);
+    }
+
+    contract?.on('ImageUploaded', handleImageUploaded);
+
+    return () => {
+      contract?.removeListener('ImageUploaded', handleImageUploaded);
+    };
+  }, [contract, parsePost]);
 
   function handleProposalAccept(hash, proposalOwner) {
     setPosts(state =>
