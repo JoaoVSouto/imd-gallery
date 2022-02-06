@@ -3,6 +3,7 @@ import { useContract } from 'react-ethers';
 import Web3 from 'web3';
 
 import Gallery from '../abis/Gallery.json';
+import { weiToEther } from '../utils/weiToEther';
 
 const AppContext = React.createContext({});
 
@@ -14,6 +15,7 @@ export function AppProvider({ children }) {
 
   const [web3, setWeb3] = React.useState(null);
   const [rawContract, setRawContract] = React.useState(null);
+  const [posts, setPosts] = React.useState([]);
 
   // TODO: remove this later
   window.contract = contract;
@@ -30,8 +32,92 @@ export function AppProvider({ children }) {
     );
   }, []);
 
+  React.useEffect(() => {
+    async function retrievePosts() {
+      const incomingPosts = await contract.getImages();
+
+      setPosts(
+        incomingPosts
+          .map(post => ({
+            hash: post.hash,
+            name: post.name,
+            owner: post.owner,
+            proposals: post.proposals.map(proposal => ({
+              owner: proposal.owner,
+              price: weiToEther(
+                Number(web3.utils.hexToNumberString(proposal.price._hex))
+              ),
+            })),
+          }))
+          .reverse()
+      );
+    }
+
+    if (contract && web3?.utils) {
+      retrievePosts();
+    }
+  }, [contract, web3?.utils]);
+
+  function handleProposalAccept(hash, proposalOwner) {
+    setPosts(state =>
+      state.map(post =>
+        post.hash === hash
+          ? {
+              ...post,
+              owner: proposalOwner,
+              proposals: [],
+            }
+          : post
+      )
+    );
+  }
+
+  function handleProposalAdd(hash, proposalOwner, proposalValue) {
+    setPosts(state =>
+      state.map(post =>
+        post.hash === hash
+          ? {
+              ...post,
+              proposals: [
+                ...post.proposals,
+                {
+                  owner: proposalOwner,
+                  price: weiToEther(Number(proposalValue)),
+                },
+              ],
+            }
+          : post
+      )
+    );
+  }
+
+  function handleProposalRemoval(hash, proposalOwner) {
+    setPosts(state =>
+      state.map(post =>
+        post.hash === hash
+          ? {
+              ...post,
+              proposals: post.proposals.filter(
+                proposal => proposal.owner !== proposalOwner
+              ),
+            }
+          : post
+      )
+    );
+  }
+
   return (
-    <AppContext.Provider value={{ contract, web3, rawContract }}>
+    <AppContext.Provider
+      value={{
+        contract,
+        web3,
+        rawContract,
+        posts,
+        handleProposalAccept,
+        handleProposalAdd,
+        handleProposalRemoval,
+      }}
+    >
       {children}
     </AppContext.Provider>
   );

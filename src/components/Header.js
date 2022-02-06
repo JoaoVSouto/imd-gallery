@@ -24,7 +24,8 @@ import { weiToEther } from '../utils/weiToEther';
 
 export function Header() {
   const { state, connectToMetamask } = useWeb3();
-  const { rawContract, web3 } = useApp();
+  const { rawContract, web3, handleProposalAccept, handleProposalRemoval } =
+    useApp();
   const toast = useToast();
 
   const [proposals, setProposals] = React.useState([]);
@@ -60,6 +61,7 @@ export function Header() {
         .acceptProposal(proposal.imageHash, proposal.owner)
         .send({ from: state.account });
 
+      handleProposalAccept(proposal.imageHash, proposal.owner);
       toast({
         title: 'Proposal accepted!',
         status: 'success',
@@ -82,6 +84,7 @@ export function Header() {
         .refuseProposal(proposal.imageHash, proposal.owner)
         .send({ from: state.account });
 
+      handleProposalRemoval(proposal.imageHash, proposal.owner);
       toast({
         title: 'Proposal refused!',
         status: 'success',
