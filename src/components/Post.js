@@ -7,16 +7,73 @@ import {
   Input,
   Text,
   Tooltip,
+  useToast,
 } from '@chakra-ui/react';
 import Identicon from 'identicon.js';
+import { useWeb3 } from 'react-ethers';
 import { FiTrash2, FiSend } from 'react-icons/fi';
 
-export function Post() {
+import { useApp } from '../contexts/App';
+import { formatAddress } from '../utils/formatAddress';
+
+export function Post({
+  hash,
+  name,
+  owner,
+  proposals,
+  onAddProposal,
+  onProposeRemoval,
+}) {
+  const { web3, rawContract } = useApp();
+  const { state } = useWeb3();
+  const toast = useToast();
+
+  const removeSendProposalField =
+    state.account === owner ||
+    proposals.some(proposal => proposal.owner === state.account);
+
+  async function createProposal(e) {
+    e.preventDefault();
+
+    const proposalValue = e.target.elements.proposal.value;
+
+    await rawContract.methods.addProposal(hash).send({
+      from: state.account,
+      value: web3.utils.toWei(proposalValue, 'ether'),
+    });
+
+    toast({
+      title: 'Proposal sent!',
+      status: 'success',
+      duration: 2000,
+      isClosable: true,
+    });
+    e.target.reset();
+    onAddProposal(
+      hash,
+      state.account,
+      web3.utils.toWei(proposalValue, 'ether')
+    );
+  }
+
+  async function removeProposal() {
+    await rawContract.methods.removeProposal(hash).send({
+      from: state.account,
+    });
+    toast({
+      title: 'Proposal removed!',
+      status: 'success',
+      duration: 2000,
+      isClosable: true,
+    });
+    onProposeRemoval(hash, state.account);
+  }
+
   return (
     <Flex direction="column" h="100%">
       <Image
-        src="https://www.arweave.net/gySlSWWvotlwL1lWwtSE_HpROBjfnSVbzP0UX44Kdws?ext=png"
-        alt="NoiaDuck 331"
+        src={`https://ipfs.infura.io/ipfs/${hash}`}
+        alt={name}
         objectFit="cover"
         borderTopRadius="md"
       />
@@ -28,19 +85,16 @@ export function Post() {
         direction="column"
       >
         <Text fontWeight="semibold" fontSize="lg" px={4}>
-          Noia Duck 331
+          {name}
         </Text>
         <Flex px={4} gap={2} mb={1}>
           <Text fontStyle="italic" fontSize="sm">
-            Owned by 0xDdD...C38
+            Owned by {formatAddress(owner)}
           </Text>
           <Image
             borderRadius="full"
             boxSize="20px"
-            src={`data:image/png;base64,${new Identicon(
-              '0x84a98BE8b2413a4A8d2e3cabe1a674Aee80f5290',
-              20
-            ).toString()}`}
+            src={`data:image/png;base64,${new Identicon(owner, 20).toString()}`}
             alt="user profile"
           />
         </Flex>
@@ -48,69 +102,71 @@ export function Post() {
         <Flex flex={1} direction="column" px={4} gap={2}>
           <Flex direction="column" gap={1}>
             <Text fontWeight="semibold">Proposals</Text>
-            {/* <Text
-              fontStyle="italic"
-              fontSize="sm"
-              color="gray.300"
-              lineHeight="shorter"
-              mb={1}
-            >
-              This piece doesn&apos;t have any proposals yet...
-            </Text> */}
-
-            <Flex align="center" justify="space-between">
-              <Flex align="center" gap={2}>
-                <Text>3 Ξ by 0xDdD...C38</Text>
-                <Image
-                  borderRadius="full"
-                  boxSize="20px"
-                  src={`data:image/png;base64,${new Identicon(
-                    '0x6ef56C35548F2eCEc6aE17A4DDbf4719829d6211',
-                    20
-                  ).toString()}`}
-                  alt="user profile"
-                />
-              </Flex>
-            </Flex>
-            <Flex align="center" justify="space-between">
-              <Flex align="center" gap={2}>
-                <Text>3 Ξ by 0xDdD...C38</Text>
-                <Image
-                  borderRadius="full"
-                  boxSize="20px"
-                  src={`data:image/png;base64,${new Identicon(
-                    '0xDdDbC91414064cd761E389F235123eF059eebC38',
-                    20
-                  ).toString()}`}
-                  alt="user profile"
-                />
-              </Flex>
-              <Tooltip
-                label="Remove your proposal"
-                placement="top"
-                bg="gray.600"
-                color="white"
-                hasArrow
+            {proposals.length === 0 && (
+              <Text
+                fontStyle="italic"
+                fontSize="sm"
+                color="gray.300"
+                lineHeight="shorter"
+                mb={1}
               >
-                <Button colorScheme="red" variant="link">
-                  <Icon as={FiTrash2} />
-                </Button>
-              </Tooltip>
-            </Flex>
+                This piece doesn&apos;t have any proposals yet...
+              </Text>
+            )}
+
+            {proposals.map(proposal => (
+              <Flex key={proposal.owner} align="center" justify="space-between">
+                <Flex align="center" gap={2}>
+                  <Text>
+                    {proposal.price} Ξ by {formatAddress(proposal.owner)}
+                  </Text>
+                  <Image
+                    borderRadius="full"
+                    boxSize="20px"
+                    src={`data:image/png;base64,${new Identicon(
+                      proposal.owner,
+                      20
+                    ).toString()}`}
+                    alt="user profile"
+                  />
+                </Flex>
+                {state.account === proposal.owner && (
+                  <Tooltip
+                    label="Remove your proposal"
+                    placement="top"
+                    bg="gray.600"
+                    color="white"
+                    hasArrow
+                  >
+                    <Button
+                      colorScheme="red"
+                      variant="link"
+                      onClick={removeProposal}
+                    >
+                      <Icon as={FiTrash2} />
+                    </Button>
+                  </Tooltip>
+                )}
+              </Flex>
+            ))}
           </Flex>
 
-          <Flex as="form" mt="auto" mb={1}>
-            <Input
-              size="sm"
-              type="number"
-              placeholder="Send a proposal in ETH..."
-              variant="filled"
-              isRequired
-            />
-            <Button type="submit" colorScheme="messenger" variant="link">
-              <Icon as={FiSend} />
-            </Button>
-          </Flex>
+          {!removeSendProposalField && (
+            <Flex as="form" mt="auto" mb={1} onSubmit={createProposal}>
+              <Input
+                size="sm"
+                name="proposal"
+                type="number"
+                step="any"
+                placeholder="Send a proposal in ETH..."
+                variant="filled"
+                isRequired
+              />
+              <Button type="submit" colorScheme="messenger" variant="link">
+                <Icon as={FiSend} />
+              </Button>
+            </Flex>
+          )}
         </Flex>
       </Flex>
     </Flex>

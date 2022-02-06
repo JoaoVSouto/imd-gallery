@@ -1,7 +1,6 @@
 import Head from 'next/head';
 import { Container } from '@chakra-ui/react';
 
-import { Gallery } from '../components/Gallery';
 import dynamic from 'next/dynamic';
 
 const Header = dynamic(
@@ -12,6 +11,12 @@ const Header = dynamic(
 );
 const UploadSection = dynamic(
   () => import('../components/UploadSection').then(mod => mod.UploadSection),
+  {
+    ssr: false,
+  }
+);
+const Gallery = dynamic(
+  () => import('../components/Gallery').then(mod => mod.Gallery),
   {
     ssr: false,
   }

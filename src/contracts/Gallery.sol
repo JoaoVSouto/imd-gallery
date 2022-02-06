@@ -12,6 +12,12 @@ contract Gallery {
         uint256 price;
     }
 
+    struct ProposalImage {
+        address payable owner;
+        uint256 price;
+        string hash;
+    }
+
     struct Image {
         address payable owner;
         string name;
@@ -26,6 +32,42 @@ contract Gallery {
         owner = payable(msg.sender);
     }
 
+    function getProposalsByOwner()
+        public
+        view
+        returns (ProposalImage[] memory)
+    {
+        uint256 qntProposals = 0;
+        uint256 index;
+        for (uint256 i = 0; i < images.length; i++) {
+            if (msg.sender == images[i].owner) {
+                qntProposals += images[i].proposals.length;
+            }
+        }
+        ProposalImage[] memory ownerProposals = new ProposalImage[](
+            qntProposals
+        );
+        for (uint256 i = 0; i < images.length; i++) {
+            if (msg.sender == images[i].owner) {
+                for (uint256 j = 0; j < images[i].proposals.length; j++) {
+                    ProposalImage memory proposal;
+                    proposal.owner = images[i].proposals[j].owner;
+                    proposal.price = images[i].proposals[j].price;
+                    proposal.hash = images[i].hash;
+                    ownerProposals[index] = proposal;
+                    index++;
+                }
+            }
+        }
+
+        return ownerProposals;
+    }
+
+    function getImages() public view returns (Image[] memory) {
+        return images;
+    }
+
+    // TODO: emit event when image is uploaded!
     function uploadImage(string memory name, string memory hash) public {
         require(bytes(name).length > 0);
         require(bytes(hash).length > 0);

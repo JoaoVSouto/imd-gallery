@@ -9,12 +9,20 @@ const Web3ContextProvider = dynamic(
     ssr: false,
   }
 );
+const AppProvider = dynamic(
+  () => import('../contexts/App').then(mod => mod.AppProvider),
+  {
+    ssr: false,
+  }
+);
 
 function MyApp({ Component, pageProps }) {
   return (
     <Web3ContextProvider>
       <ChakraProvider theme={theme}>
-        <Component {...pageProps} />
+        <AppProvider>
+          <Component {...pageProps} />
+        </AppProvider>
       </ChakraProvider>
     </Web3ContextProvider>
   );

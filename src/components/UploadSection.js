@@ -15,11 +15,11 @@ import {
 } from '@chakra-ui/react';
 import { useDropzone } from 'react-dropzone';
 import ipfsClient from 'ipfs-http-client';
-import { useCall, useContract } from 'react-ethers';
+import { useCall } from 'react-ethers';
 import { FiUpload } from 'react-icons/fi';
 import { IoMdCloudUpload } from 'react-icons/io';
 
-import Gallery from '../abis/Gallery.json';
+import { useApp } from '../contexts/App';
 
 const ipfs = ipfsClient({
   host: 'ipfs.infura.io',
@@ -29,10 +29,7 @@ const ipfs = ipfsClient({
 
 export function UploadSection() {
   const toast = useToast();
-  const contract = useContract(
-    Gallery.networks[window.ethereum.networkVersion].address,
-    Gallery.abi
-  );
+  const { contract } = useApp();
   const { contractCall } = useCall();
 
   const [sentFile, setSentFile] = React.useState(null);
