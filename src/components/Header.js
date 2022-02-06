@@ -71,6 +71,13 @@ export function Header() {
       setProposals(state =>
         state.filter(p => p.imageHash !== proposal.imageHash)
       );
+    } catch {
+      toast({
+        title: 'Error on accepting proposal',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
     } finally {
       setAcceptingProposal(null);
     }
@@ -92,6 +99,13 @@ export function Header() {
         isClosable: true,
       });
       setProposals(state => state.filter(p => p !== proposal));
+    } catch {
+      toast({
+        title: 'Error on refusing proposal',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
     } finally {
       setRefusingProposal(null);
     }

@@ -87,7 +87,7 @@ export function UploadSection() {
     ipfs.add(fileBuffer, async (err, result) => {
       const showErrorToast = () =>
         toast({
-          title: 'Error uploading file',
+          title: 'Error on uploading file',
           description: 'Please try again later',
           status: 'error',
           duration: 4000,

@@ -63,7 +63,7 @@ export function Post({
       );
     } catch {
       toast({
-        title: 'Error sending proposal',
+        title: 'Error on sending proposal',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -89,7 +89,7 @@ export function Post({
       onProposeRemoval(hash, state.account);
     } catch {
       toast({
-        title: 'Error removing proposal',
+        title: 'Error on removing proposal',
         status: 'error',
         duration: 3000,
         isClosable: true,
