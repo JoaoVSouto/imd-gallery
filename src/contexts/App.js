@@ -17,10 +17,6 @@ export function AppProvider({ children }) {
   const [rawContract, setRawContract] = React.useState(null);
   const [posts, setPosts] = React.useState([]);
 
-  // TODO: remove this later
-  window.contract = contract;
-  window.web33 = web3;
-
   const parsePost = React.useCallback(
     post => ({
       hash: post.hash,
