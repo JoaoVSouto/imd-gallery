@@ -34,7 +34,8 @@ export function Post({
 
   const removeSendProposalField =
     state.account === owner ||
-    proposals.some(proposal => proposal.owner === state.account);
+    proposals.some(proposal => proposal.owner === state.account) ||
+    !state.isLogged;
 
   async function createProposal(e) {
     e.preventDefault();

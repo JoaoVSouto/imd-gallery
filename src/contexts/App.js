@@ -33,7 +33,13 @@ export function AppProvider({ children }) {
   );
 
   React.useEffect(() => {
-    const newWeb3 = new Web3(window.ethereum);
+    const newWeb3 = new Web3(
+      process.env.NEXT_PUBLIC_INFURA_PROJECT_ID
+        ? new Web3.providers.HttpProvider(
+            `https://ropsten.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_PROJECT_ID}`
+          )
+        : window.ethereum
+    );
     setWeb3(newWeb3);
     setRawContract(
       new newWeb3.eth.Contract(
@@ -45,15 +51,15 @@ export function AppProvider({ children }) {
 
   React.useEffect(() => {
     async function retrievePosts() {
-      const incomingPosts = await contract.getImages();
+      const incomingPosts = await rawContract.methods.getImages().call();
 
       setPosts(incomingPosts.map(parsePost).reverse());
     }
 
-    if (contract) {
+    if (rawContract) {
       retrievePosts();
     }
-  }, [contract, parsePost]);
+  }, [rawContract, parsePost]);
 
   React.useEffect(() => {
     function handleImageUploaded(post) {

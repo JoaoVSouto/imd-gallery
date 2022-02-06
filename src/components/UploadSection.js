@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react';
 import { useDropzone } from 'react-dropzone';
 import ipfsClient from 'ipfs-http-client';
-import { useCall } from 'react-ethers';
+import { useCall, useWeb3 } from 'react-ethers';
 import { FiUpload } from 'react-icons/fi';
 import { IoMdCloudUpload } from 'react-icons/io';
 
@@ -29,6 +29,7 @@ const ipfs = ipfsClient({
 
 export function UploadSection() {
   const toast = useToast();
+  const { state } = useWeb3();
   const { contract } = useApp();
   const { contractCall } = useCall();
 
@@ -121,6 +122,10 @@ export function UploadSection() {
         resetFormState();
       }
     });
+  }
+
+  if (!state.isLogged) {
+    return null;
   }
 
   return (
