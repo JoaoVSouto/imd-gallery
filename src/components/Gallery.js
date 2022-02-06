@@ -16,17 +16,19 @@ export function Gallery() {
       const incomingPosts = await contract.getImages();
 
       setPosts(
-        incomingPosts.map(post => ({
-          hash: post.hash,
-          name: post.name,
-          owner: post.owner,
-          proposals: post.proposals.map(proposal => ({
-            owner: proposal.owner,
-            price: weiToEther(
-              Number(web3.utils.hexToNumberString(proposal.price._hex))
-            ),
-          })),
-        }))
+        incomingPosts
+          .map(post => ({
+            hash: post.hash,
+            name: post.name,
+            owner: post.owner,
+            proposals: post.proposals.map(proposal => ({
+              owner: proposal.owner,
+              price: weiToEther(
+                Number(web3.utils.hexToNumberString(proposal.price._hex))
+              ),
+            })),
+          }))
+          .reverse()
       );
     }
 

@@ -38,12 +38,14 @@ export function Header() {
         .call({ from: state.account });
 
       setProposals(
-        incomingProposals.map(proposal => ({
-          owner: proposal.owner,
-          price: weiToEther(Number(proposal.price)),
-          imageHash: proposal.hash,
-          imageName: proposal.name,
-        }))
+        incomingProposals
+          .map(proposal => ({
+            owner: proposal.owner,
+            price: weiToEther(Number(proposal.price)),
+            imageHash: proposal.hash,
+            imageName: proposal.name,
+          }))
+          .reverse()
       );
     }
 
