@@ -238,6 +238,18 @@ export function Header() {
               ).toString()}`}
               alt="user profile"
             />
+            <Text
+              fontFamily="mono"
+              bg="gray.700"
+              p={2}
+              borderRadius="md"
+              fontSize="sm"
+            >
+              {weiToEther(web3.utils.hexToNumberString(state.balance._hex))
+                .toString()
+                .slice(0, 5)}{' '}
+              ETH
+            </Text>
           </Flex>
         ) : (
           <Button colorScheme="orange" onClick={connectToMetamask}>
