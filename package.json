@@ -12,6 +12,8 @@
     "@chakra-ui/react": "^1.8.1",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
+    "@truffle/hdwallet-provider": "^2.0.3",
+    "dotenv": "^16.0.0",
     "framer-motion": "^5",
     "identicon.js": "^2.3.3",
     "ipfs-http-client": "^33.1.1",
