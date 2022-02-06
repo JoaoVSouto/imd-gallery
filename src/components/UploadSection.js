@@ -103,14 +103,10 @@ export function UploadSection() {
       const [{ hash: fileHash }] = result;
 
       try {
-        const response = await contractCall(contract, 'uploadImage', [
+        await contractCall(contract, 'uploadImage', [
           imageTitle.trim(),
           fileHash,
         ]);
-
-        if (!response) {
-          throw new Error('No response');
-        }
 
         toast({
           title: 'File uploaded!',
