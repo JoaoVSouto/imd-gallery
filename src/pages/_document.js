@@ -21,6 +21,8 @@ export default class Document extends NextDocument {
             href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;600;700&display=swap"
             rel="stylesheet"
           />
+
+          <meta name="theme-color" content="#1A202C" />
         </Head>
         <body>
           <ColorModeScript initialColorMode="dark" />
