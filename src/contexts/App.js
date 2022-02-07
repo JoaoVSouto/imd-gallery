@@ -36,13 +36,14 @@ export function AppProvider({ children }) {
     [web3?.utils]
   );
 
+  console.log('ingura', process.env.NEXT_PUBLIC_INFURA_PROJECT_ID);
+
   React.useEffect(() => {
     const newWeb3 = new Web3(
-      process.env.NEXT_PUBLIC_INFURA_PROJECT_ID
-        ? new Web3.providers.HttpProvider(
-            `https://ropsten.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_PROJECT_ID}`
-          )
-        : window.ethereum
+      window.ethereum ??
+        new Web3.providers.HttpProvider(
+          `https://ropsten.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_PROJECT_ID}`
+        )
     );
     setWeb3(newWeb3);
     setRawContract(
