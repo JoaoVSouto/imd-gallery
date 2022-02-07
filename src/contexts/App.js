@@ -36,8 +36,6 @@ export function AppProvider({ children }) {
     [web3?.utils]
   );
 
-  console.log('ingura', process.env.NEXT_PUBLIC_INFURA_PROJECT_ID);
-
   React.useEffect(() => {
     const newWeb3 = new Web3(
       window.ethereum ??
