@@ -4,7 +4,11 @@
 // Conta do contrato: 0x000000
 
 // Seu contrato começa aqui!
-pragma solidity ^0.8.11;
+pragma solidity ^0.7.6;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Gallery {
     struct Proposal {
@@ -80,8 +84,10 @@ contract Gallery {
         require(msg.sender != address(0));
 
         for (uint256 i = 0; i < images.length; i++) {
-            if (keccak256(abi.encodePacked(images[i].hash)) ==
-                keccak256(abi.encodePacked(hash))) {
+            if (
+                keccak256(abi.encodePacked(images[i].hash)) ==
+                keccak256(abi.encodePacked(hash))
+            ) {
                 require(false, "Image already exists");
             }
         }
