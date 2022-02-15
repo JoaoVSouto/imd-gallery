@@ -1,9 +1,4 @@
 // SPDX-License-Identifier: MIT
-// Nome: João Vítor Souto dos Santos
-// Nome: Rafael Silva Freire
-// Conta do contrato: 0x000000
-
-// Seu contrato começa aqui!
 pragma solidity ^0.8.11;
 
 contract Gallery {
