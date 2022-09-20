@@ -103,7 +103,7 @@ export function Post({
   return (
     <Flex direction="column" h="100%">
       <Image
-        src={`https://ipfs.infura.io/ipfs/${hash}`}
+        src={`https://ipfs.io/ipfs/${hash}`}
         alt={name}
         objectFit="cover"
         borderTopRadius="md"
